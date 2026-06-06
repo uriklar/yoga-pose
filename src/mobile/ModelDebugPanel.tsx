@@ -16,6 +16,7 @@ type ModelDebug = {
   landmarkCoverage?: Coverage;
   frameDiagnostics?: FrameDiagnostic[];
   templateDistanceSummary?: { min?: number; median?: number; max?: number } | null;
+  qualityGate?: { ok?: boolean; reasons?: string[]; missingRequired?: string[]; visibleRequiredRatio?: number } | null;
   note?: string;
 };
 
@@ -25,6 +26,7 @@ export function ModelDebugPanel({ debug, frameSummary, scoringMode }: { debug?: 
   if (!debug) return null;
   const lowCoverage = Object.entries(debug.landmarkCoverage ?? {}).filter(([, c]) => (c.percent ?? 0) < 80);
   const worst = debug.worstFrame;
+  const missingRequired = debug.qualityGate?.missingRequired ?? [];
   const worstMetrics = Object.entries(worst?.metrics ?? {}).filter(([, value]) => Number.isFinite(value));
 
   return (
@@ -38,6 +40,14 @@ export function ModelDebugPanel({ debug, frameSummary, scoringMode }: { debug?: 
         <Metric label="Worst frame" value={debug.worstFrameIndex === null || debug.worstFrameIndex === undefined ? 'n/a' : `#${debug.worstFrameIndex + 1}`} />
         <Metric label="Scoring" value={scoringMode?.replaceAll('-', ' ') ?? 'aggregate'} />
       </View>
+
+      {debug.qualityGate && !debug.qualityGate.ok && (
+        <View style={styles.failureBox}>
+          <Text style={styles.failureTitle}>Setup failed: full body not visible</Text>
+          <Text style={styles.failureText}>{debug.qualityGate.reasons?.join(' ') || 'Required body landmarks were not visible enough to analyze.'}</Text>
+          {Boolean(missingRequired.length) && <Text style={styles.failureText}>Missing/low-confidence: {missingRequired.join(', ').replace(/([A-Z])/g, ' $1').toLowerCase()}</Text>}
+        </View>
+      )}
 
       {frameSummary && (
         <Text style={styles.line}>Frame scores: worst {frameSummary.min ?? 'n/a'} · median {frameSummary.median ?? 'n/a'} · best {frameSummary.max ?? 'n/a'}</Text>
@@ -89,5 +99,8 @@ const styles = StyleSheet.create({
   rowLabel: { color: '#d1d5db', fontSize: 13, fontWeight: '700' },
   rowValue: { color: '#e5e7eb', fontSize: 13, fontWeight: '900' },
   warn: { color: '#fbbf24' },
+  failureBox: { backgroundColor: '#451a03', borderColor: '#f59e0b', borderWidth: 1, borderRadius: 12, padding: 10 },
+  failureTitle: { color: '#fef3c7', fontSize: 14, fontWeight: '900' },
+  failureText: { color: '#fde68a', fontSize: 13, lineHeight: 18, marginTop: 4 },
   warning: { color: '#fbbf24', fontSize: 13, lineHeight: 18, marginTop: 4 },
 });

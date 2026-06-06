@@ -97,3 +97,9 @@ Verified with `npx tsc --noEmit`, `npm test`, and `pnpm exec expo export --platf
 Built-in target templates now include head landmarks (`nose`, eyes, ears) and foot landmarks (`heel`, `footIndex`) in addition to the coaching joints. The overlay renderer draws head/neck and foot segments when landmarks exist, so template overlays look closer to MediaPipe skeletons instead of simplified torso/limb graphs.
 
 Verified with `npx tsc --noEmit`, `npm test`, and `pnpm exec expo export --platform ios`.
+
+## Full-body setup gate
+
+Before rule or reference scoring, the app now checks minimum video quality: required pose landmarks must be visible with confidence >= 0.5 in at least 60% of sampled frames, and the selected pose’s required upper/lower body groups must be visible. Face-only or partial-body clips fail with `setup-full-body-required`, score 0, and no target overlay is drawn. Low-confidence landmarks are filtered out of the visual overlay so hallucinated/inferred body parts are not shown as real detections.
+
+Verified with `npx tsc --noEmit`, `npm test`, and `pnpm exec expo export --platform ios`.

@@ -1,14 +1,8 @@
 import { midpoint, lineDeviationDegrees } from './geometry.mjs';
 import { validateLandmarks } from './yogaRules.mjs';
+import { REQUIRED_BY_POSE } from './videoQualityGate.mjs';
 
-const REQUIRED_BY_POSE = {
-  plank: ['leftShoulder','rightShoulder','leftHip','rightHip','leftAnkle','rightAnkle','leftWrist','rightWrist'],
-  warrior2: ['leftShoulder','rightShoulder','leftElbow','rightElbow','leftWrist','rightWrist','leftHip','rightHip','leftKnee','rightKnee','leftAnkle','rightAnkle'],
-  downwardDog: ['leftShoulder','rightShoulder','leftHip','rightHip','leftKnee','rightKnee','leftWrist','rightWrist'],
-  tree: ['leftShoulder','rightShoulder','leftHip','rightHip','leftKnee','rightKnee','leftAnkle','rightAnkle'],
-};
-
-export function createModelDebug({ pose, frames = [], frameResults = [], templateMatches = [] }) {
+export function createModelDebug({ pose, frames = [], frameResults = [], templateMatches = [], qualityGate = null }) {
   const required = REQUIRED_BY_POSE[pose] ?? REQUIRED_BY_POSE.plank;
   const frameDiagnostics = frames.map((frame, index) => {
     const gate = validateLandmarks(frame, required);
@@ -39,7 +33,8 @@ export function createModelDebug({ pose, frames = [], frameResults = [], templat
     worstFrame: worst,
     frameDiagnostics,
     templateDistanceSummary: summarizeTemplateDistances(templateMatches),
-    note: 'Scores are based on pose landmarks, not raw video pixels. If landmarks are missing, jumpy, or far from the selected pose template, the score can be misleading.',
+    qualityGate,
+    note: 'Scores are based on pose landmarks, not raw video pixels. If required full-body landmarks are missing, the app should fail setup instead of scoring.',
   };
 }
 

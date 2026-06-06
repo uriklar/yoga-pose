@@ -4,15 +4,28 @@ import { compareToReference } from '../core/referenceComparison.mjs';
 import { createVisualComparison } from '../core/visualComparison.mjs';
 import { createModelDebug } from '../core/modelDebug.mjs';
 import { applyTemplateSanityGate, compareToPoseTemplate } from '../core/templateSimilarity.mjs';
+import { assessMinimumVideoQuality, setupFailureFromQualityGate } from '../core/videoQualityGate.mjs';
 
 export function analyzeSession({ pose, userLandmarkFrames = [], referenceLandmarkFrames = null }) {
+  const qualityGate = assessMinimumVideoQuality({ pose, frames: userLandmarkFrames });
+  if (!qualityGate.ok) {
+    const result = setupFailureFromQualityGate(pose, qualityGate);
+    return {
+      ...result,
+      modelDebug: createModelDebug({ pose, frames: userLandmarkFrames, frameResults: [], templateMatches: [], qualityGate }),
+      visualComparison: createVisualComparison({ pose, userLandmarkFrames, feedback: result.feedback, includeTarget: false }),
+    };
+  }
+
   if (referenceLandmarkFrames?.length) {
     const result = compareToReference({ pose, referenceFrames: referenceLandmarkFrames, userFrames: userLandmarkFrames });
     return {
       ...result,
+      modelDebug: createModelDebug({ pose, frames: userLandmarkFrames, frameResults: [], templateMatches: [], qualityGate }),
       visualComparison: createVisualComparison({ pose, userLandmarkFrames, referenceLandmarkFrames, feedback: result.feedback, bodyAreaScores: result.bodyAreaScores }),
     };
   }
+
   const templateMatches = userLandmarkFrames.map((landmarks) => compareToPoseTemplate({ pose, landmarks }));
   const frameResults = userLandmarkFrames.map((landmarks, index) => applyTemplateSanityGate(analyzePose({ pose, landmarks }), templateMatches[index]));
   const usableFrameResults = frameResults.filter((frame) => frame.confidence > 0.95);
@@ -32,7 +45,7 @@ export function analyzeSession({ pose, userLandmarkFrames = [], referenceLandmar
   }, aggregateTemplateMatch);
   return {
     ...result,
-    modelDebug: createModelDebug({ pose, frames: userLandmarkFrames, frameResults, templateMatches }),
+    modelDebug: createModelDebug({ pose, frames: userLandmarkFrames, frameResults, templateMatches, qualityGate }),
     visualComparison: createVisualComparison({ pose, userLandmarkFrames, feedback: result.feedback }),
   };
 }

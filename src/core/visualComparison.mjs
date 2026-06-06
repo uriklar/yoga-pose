@@ -2,12 +2,12 @@ import { aggregateLandmarkFrames } from './landmarkAdapters.mjs';
 import { compareFrames, normalizeLandmarks } from './referenceComparison.mjs';
 import { highlightedAreasFromFeedback, targetTemplateForPose } from './poseTemplates.mjs';
 
-export function createVisualComparison({ pose, userLandmarkFrames = [], referenceLandmarkFrames = null, feedback = [], bodyAreaScores = [] }) {
-  const userPose = aggregateLandmarkFrames(userLandmarkFrames);
-  const referencePose = referenceLandmarkFrames?.length ? aggregateLandmarkFrames(referenceLandmarkFrames) : targetTemplateForPose(pose);
+export function createVisualComparison({ pose, userLandmarkFrames = [], referenceLandmarkFrames = null, feedback = [], bodyAreaScores = [], includeTarget = true }) {
+  const userPose = filterLowConfidenceLandmarks(aggregateLandmarkFrames(userLandmarkFrames));
+  const referencePose = includeTarget ? (referenceLandmarkFrames?.length ? aggregateLandmarkFrames(referenceLandmarkFrames) : targetTemplateForPose(pose)) : null;
   const normalizedUser = normalizeLandmarks(userPose);
-  const normalizedTarget = normalizeLandmarks(referencePose);
-  const frame = compareFrames(normalizedTarget, normalizedUser);
+  const normalizedTarget = referencePose ? normalizeLandmarks(referencePose) : null;
+  const frame = normalizedTarget ? compareFrames(normalizedTarget, normalizedUser) : { landmarkDistances: {} };
   const highlightedAreas = highlightedAreasFromFeedback(feedback, bodyAreaScores);
 
   return {
@@ -24,4 +24,9 @@ export function createVisualComparison({ pose, userLandmarkFrames = [], referenc
       target: referenceLandmarkFrames?.length ? 'Reference pose' : 'Target shape',
     },
   };
+}
+
+
+function filterLowConfidenceLandmarks(landmarks = {}, minScore = 0.5) {
+  return Object.fromEntries(Object.entries(landmarks).filter(([, point]) => point && Number.isFinite(point.x) && Number.isFinite(point.y) && (point.score ?? 1) >= minScore));
 }
