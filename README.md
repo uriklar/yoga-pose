@@ -49,4 +49,8 @@ npm start
 
 ## Verification
 
-See `docs/VERIFY.md`. Current gates pass: TypeScript, Node tests, Expo web export, high/critical audit gate, and reference-ingest API smoke test.
+See `docs/VERIFY.md`. Current gates pass: Expo Doctor, TypeScript, Node tests, Expo web export, high/critical audit gate, and reference-ingest API smoke test.
+
+## Expo Go compatibility
+
+This project is intentionally pinned to Expo SDK 54 because Uri’s installed Expo Go client reports Supported SDK 54. Do not upgrade to SDK 56 unless Expo Go / a dev build supports it.

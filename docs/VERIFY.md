@@ -7,7 +7,7 @@ npm view expo version
 npm list expo --depth=0
 ```
 
-Expected for this build: `56.0.9`.
+Expected for Expo Go compatibility in this build: SDK `54`, package `expo@54.0.35`. Uri’s Expo Go client showed Supported SDK 54.
 
 ## Local gates
 
@@ -24,7 +24,7 @@ npx expo export --platform web
 npm start
 ```
 
-For real MediaPipe analysis today, use the web build path with a browser-readable uploaded/local video. Native Expo recording/import is implemented, but native pose detection intentionally returns a clear “native detector missing” result until the iOS detector adapter is built.
+For real MediaPipe analysis, use the web build path with a browser-readable uploaded/local video. Native Expo recording/import is implemented, but native pose detection intentionally returns a clear “native detector missing” result until the iOS detector adapter is built.
 
 ## Reference comparison
 
@@ -65,3 +65,7 @@ Known caveats for verification:
 - Requires network access to load MediaPipe Tasks Vision/model from CDN.
 - Long clips are capped to sampled frames for performance.
 - Reference comparison on native currently requires an uploaded reference clip, not a YouTube/page link.
+
+## Expo Go compatibility
+
+This project is intentionally pinned to Expo SDK 54 because Uri’s installed Expo Go client reports Supported SDK 54. Do not upgrade to SDK 56 unless Expo Go / a dev build supports it.
