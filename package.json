@@ -15,6 +15,7 @@
     "ingest:server": "node scripts/reference-ingest-server.mjs"
   },
   "dependencies": {
+    "@expo/metro-runtime": "~6.1.2",
     "@mediapipe/tasks-vision": "latest",
     "expo": "54.0.35",
     "expo-camera": "~17.0.10",

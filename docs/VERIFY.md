@@ -69,3 +69,7 @@ Known caveats for verification:
 ## Expo Go compatibility
 
 This project is intentionally pinned to Expo SDK 54 because Uri’s installed Expo Go client reports Supported SDK 54. Do not upgrade to SDK 56 unless Expo Go / a dev build supports it.
+
+## pnpm users
+
+`expo-router` needs `@expo/metro-runtime` available as a direct dependency under pnpm’s strict resolver. This repo includes it explicitly and includes `pnpm-lock.yaml`. Verified with a clean pnpm install and `pnpm exec expo export --platform ios`.
