@@ -49,3 +49,19 @@ curl -s -X POST http://127.0.0.1:4731/ingest \
   -H 'content-type: application/json' \
   -d '{"url":"https://example.com/reference.mp4"}'
 ```
+
+## Native phone landmark extraction
+
+Implemented basic native path:
+
+1. Record/import a phone video.
+2. Tap analyze on native Expo.
+3. App routes to `/native-analyze`.
+4. `expo-video-thumbnails` samples frames from the actual phone video.
+5. A local WebView loads MediaPipe PoseLandmarker and extracts landmarks from sampled frames.
+6. Landmarks flow into the existing pose-rule/reference comparison engine.
+
+Known caveats for verification:
+- Requires network access to load MediaPipe Tasks Vision/model from CDN.
+- Long clips are capped to sampled frames for performance.
+- Reference comparison on native currently requires an uploaded reference clip, not a YouTube/page link.

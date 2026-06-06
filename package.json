@@ -22,11 +22,13 @@
     "expo-file-system": "latest",
     "expo-image-picker": "latest",
     "expo-router": "latest",
+    "expo-video-thumbnails": "~56.0.3",
     "react": "latest",
     "react-native": "latest",
     "react-native-safe-area-context": "latest",
     "react-native-screens": "latest",
-    "react-native-web": "^0.21.2"
+    "react-native-web": "^0.21.2",
+    "react-native-webview": "13.16.1"
   },
   "devDependencies": {
     "@types/react": "^19.2.17",

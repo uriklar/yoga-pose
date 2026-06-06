@@ -29,7 +29,11 @@ export default function AnalyzeScreen() {
     setBusy(true);
     setStatus(mode === 'reference' ? 'Preparing reference comparison…' : 'Preparing pose analysis…');
     try {
-      setStatus(Platform.OS === 'web' ? 'Sampling video frames and running pose detection…' : 'Checking native analysis support…');
+      if (Platform.OS !== 'web') {
+        router.push({ pathname: '/native-analyze', params: { pose, mode } });
+        return;
+      }
+      setStatus('Sampling video frames and running pose detection…');
       const result = await analyzeDraftSession({ pose, mode });
       setStatus('Saving result…');
       await saveLastResult(result);
@@ -46,7 +50,7 @@ export default function AnalyzeScreen() {
       <Text style={styles.subtitle}>
         {Platform.OS === 'web'
           ? 'Web build: real frame sampling + MediaPipe pose detection runs for imported/recorded browser-readable video files.'
-          : 'Native build: recording/import works; real native pose detection still needs the iOS detector adapter, so results will tell you if analysis cannot run yet.'}
+          : 'Native build: extracts video frames on-device, runs MediaPipe in a local WebView bridge, then feeds landmarks into the coaching engine.'}
       </Text>
       {!hasVideo && <Text style={styles.warning}>No user video found yet. Go back and import or record a yoga clip.</Text>}
 

@@ -31,7 +31,7 @@ export default function HomeScreen() {
     if (result.canceled) return;
     const uri = result.assets[0].uri;
     setReferenceVideoUri(uri);
-    await saveDraftSession({ referenceVideoUri: uri, referenceUrl: referenceUrl.trim() || undefined });
+    await saveDraftSession({ referenceVideoUri: uri, referenceVideoDurationMs: result.assets[0].duration, referenceUrl: referenceUrl.trim() || undefined });
   }
 
   async function importUserVideo() {
@@ -42,7 +42,7 @@ export default function HomeScreen() {
     });
     if (result.canceled) return;
     const asset = result.assets[0];
-    await saveDraftSession({ userVideoUri: asset.uri, referenceUrl: referenceUrl.trim() || undefined, referenceVideoUri });
+    await saveDraftSession({ userVideoUri: asset.uri, userVideoDurationMs: asset.duration, referenceUrl: referenceUrl.trim() || undefined, referenceVideoUri });
     router.push('/analyze');
   }
 

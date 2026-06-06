@@ -20,7 +20,8 @@
 - [x] Install app dependencies and verify Expo web export
 - [x] Replace in-memory session store with local file-backed storage
 - [x] Add MediaPipe web detector adapter
-- [ ] Add native iOS MediaPipe/MoveNet detector adapter
+- [x] Add basic native phone landmark extraction bridge
+- [ ] Harden native detector performance/error handling
 - [ ] Add MoveNet adapter spike
 - [x] Add web frame sampler
 - [ ] Add landmark overlay visualization
