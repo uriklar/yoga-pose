@@ -1,0 +1,25 @@
+{
+  "expo": {
+    "name": "Yoga Pose Coach",
+    "slug": "yoga-pose-coach",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "scheme": "yogacoach",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSCameraUsageDescription": "Record yoga videos for local posture analysis.",
+        "NSPhotoLibraryUsageDescription": "Import yoga videos for local posture analysis.",
+        "NSMicrophoneUsageDescription": "Record audio if you choose to capture it with your yoga video."
+      }
+    },
+    "android": {
+      "permissions": ["CAMERA", "READ_MEDIA_VIDEO", "RECORD_AUDIO"]
+    },
+    "plugins": ["expo-router", "expo-image-picker", "expo-camera"],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

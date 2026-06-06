@@ -1,0 +1,35 @@
+{
+  "name": "yoga-pose-coach",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "expo-router/entry",
+  "scripts": {
+    "test": "node --test __tests__/*.test.mjs",
+    "demo": "node src/core/demo.mjs",
+    "start": "expo start",
+    "ios": "expo start --ios",
+    "android": "expo start --android",
+    "web": "expo start --web",
+    "ingest:reference": "node scripts/reference-ingest.mjs",
+    "ingest:server": "node scripts/reference-ingest-server.mjs"
+  },
+  "dependencies": {
+    "@mediapipe/tasks-vision": "latest",
+    "expo": "56.0.9",
+    "expo-av": "latest",
+    "expo-camera": "latest",
+    "expo-file-system": "latest",
+    "expo-image-picker": "latest",
+    "expo-router": "latest",
+    "react": "latest",
+    "react-native": "latest",
+    "react-native-safe-area-context": "latest",
+    "react-native-screens": "latest",
+    "react-native-web": "^0.21.2"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.17",
+    "typescript": "^6.0.3"
+  }
+}
