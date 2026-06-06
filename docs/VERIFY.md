@@ -85,3 +85,9 @@ Verified with `npx tsc --noEmit`, `npm test`, and `pnpm exec expo export --platf
 Rule-based pose scoring now scores each sampled frame and biases toward the worst usable frame instead of hiding bad moments inside one median skeleton. The result screen includes a “What the model actually saw” panel with frame score range, worst frame, plank metrics, and landmark coverage so false positives/landmark failures are visible.
 
 Verified with `npx tsc --noEmit`, `npm test`, and `pnpm exec expo export --platform ios`.
+
+## Selected-pose sanity gate
+
+Rule-based scoring now compares detected landmarks against the selected pose template before allowing a high score. If the skeleton is far from the chosen pose shape (for example, a non-Warrior-II shape while Warrior II is selected), the score is capped and result feedback includes `pose-template-mismatch`. The debug panel shows selected-pose match distance with target `<0.36`.
+
+Verified with `npx tsc --noEmit`, `npm test`, and `pnpm exec expo export --platform ios`.

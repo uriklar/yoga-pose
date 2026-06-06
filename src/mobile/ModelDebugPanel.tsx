@@ -15,6 +15,7 @@ type ModelDebug = {
   worstFrame?: FrameDiagnostic | null;
   landmarkCoverage?: Coverage;
   frameDiagnostics?: FrameDiagnostic[];
+  templateDistanceSummary?: { min?: number; median?: number; max?: number } | null;
   note?: string;
 };
 
@@ -40,6 +41,9 @@ export function ModelDebugPanel({ debug, frameSummary, scoringMode }: { debug?: 
 
       {frameSummary && (
         <Text style={styles.line}>Frame scores: worst {frameSummary.min ?? 'n/a'} · median {frameSummary.median ?? 'n/a'} · best {frameSummary.max ?? 'n/a'}</Text>
+      )}
+      {debug.templateDistanceSummary && (
+        <Text style={styles.line}>Selected-pose match distance: best {debug.templateDistanceSummary.min ?? 'n/a'} · median {debug.templateDistanceSummary.median ?? 'n/a'} · worst {debug.templateDistanceSummary.max ?? 'n/a'} · target under 0.36</Text>
       )}
 
       {Boolean(worstMetrics.length) && <Text style={styles.subhead}>Worst-frame plank metrics</Text>}

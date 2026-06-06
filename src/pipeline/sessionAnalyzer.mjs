@@ -3,6 +3,7 @@ import { analyzePose } from '../core/poseAnalyzer.mjs';
 import { compareToReference } from '../core/referenceComparison.mjs';
 import { createVisualComparison } from '../core/visualComparison.mjs';
 import { createModelDebug } from '../core/modelDebug.mjs';
+import { applyTemplateSanityGate, compareToPoseTemplate } from '../core/templateSimilarity.mjs';
 
 export function analyzeSession({ pose, userLandmarkFrames = [], referenceLandmarkFrames = null }) {
   if (referenceLandmarkFrames?.length) {
@@ -12,24 +13,26 @@ export function analyzeSession({ pose, userLandmarkFrames = [], referenceLandmar
       visualComparison: createVisualComparison({ pose, userLandmarkFrames, referenceLandmarkFrames, feedback: result.feedback, bodyAreaScores: result.bodyAreaScores }),
     };
   }
-  const frameResults = userLandmarkFrames.map((landmarks) => analyzePose({ pose, landmarks }));
+  const templateMatches = userLandmarkFrames.map((landmarks) => compareToPoseTemplate({ pose, landmarks }));
+  const frameResults = userLandmarkFrames.map((landmarks, index) => applyTemplateSanityGate(analyzePose({ pose, landmarks }), templateMatches[index]));
   const usableFrameResults = frameResults.filter((frame) => frame.confidence > 0.95);
   const aggregate = aggregateLandmarkFrames(userLandmarkFrames);
   const aggregateResult = analyzePose({ pose, landmarks: aggregate });
   const scoredFrames = usableFrameResults.length ? usableFrameResults : frameResults;
   const worstResult = scoredFrames.length ? [...scoredFrames].sort((a, b) => a.score - b.score)[0] : aggregateResult;
   const medianScore = median(scoredFrames.map((frame) => frame.score));
-  const result = {
+  const aggregateTemplateMatch = compareToPoseTemplate({ pose, landmarks: aggregate });
+  const result = applyTemplateSanityGate({
     ...aggregateResult,
     score: Number.isFinite(medianScore) ? Math.round(worstResult.score * 0.7 + medianScore * 0.3) : aggregateResult.score,
     confidence: round(mean(frameResults.map((frame) => frame.confidence))),
     feedback: mergeFeedback(worstResult.feedback, aggregateResult.feedback),
     scoringMode: 'per-frame-worst-biased',
     frameScoreSummary: summarizeFrameScores(frameResults),
-  };
+  }, aggregateTemplateMatch);
   return {
     ...result,
-    modelDebug: createModelDebug({ pose, frames: userLandmarkFrames, frameResults }),
+    modelDebug: createModelDebug({ pose, frames: userLandmarkFrames, frameResults, templateMatches }),
     visualComparison: createVisualComparison({ pose, userLandmarkFrames, feedback: result.feedback }),
   };
 }

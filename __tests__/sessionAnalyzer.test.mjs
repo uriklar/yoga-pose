@@ -1,17 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { analyzeSession, chooseAnalysisMode } from '../src/pipeline/sessionAnalyzer.mjs';
+import { targetTemplateForPose } from '../src/core/poseTemplates.mjs';
 
-const plank = {
-  leftShoulder: { x: 0.25, y: 0.30, score: 0.9 },
-  rightShoulder: { x: 0.35, y: 0.31, score: 0.9 },
-  leftHip: { x: 0.55, y: 0.47, score: 0.9 },
-  rightHip: { x: 0.65, y: 0.48, score: 0.9 },
-  leftAnkle: { x: 0.88, y: 0.66, score: 0.9 },
-  rightAnkle: { x: 0.92, y: 0.67, score: 0.9 },
-  leftWrist: { x: 0.24, y: 0.62, score: 0.9 },
-  rightWrist: { x: 0.35, y: 0.62, score: 0.9 },
-};
+const plank = targetTemplateForPose('plank');
 
 test('chooseAnalysisMode picks reference when reference is present', () => {
   assert.equal(chooseAnalysisMode({ referenceUrl: 'https://example.com/yoga' }), 'reference');
@@ -33,8 +25,8 @@ test('analyzeSession exposes worst plank frame instead of hiding it in the media
   const good = plank;
   const horrible = {
     ...plank,
-    leftHip: { x: 0.55, y: 0.02, score: 0.9 },
-    rightHip: { x: 0.65, y: 0.03, score: 0.9 },
+    leftHip: { x: 0.50, y: 0.08, score: 1 },
+    rightHip: { x: 0.54, y: 0.09, score: 1 },
   };
   const goodOnly = analyzeSession({ pose: 'plank', userLandmarkFrames: [good, good, good] });
   const mixed = analyzeSession({ pose: 'plank', userLandmarkFrames: [good, horrible, good] });
@@ -43,4 +35,19 @@ test('analyzeSession exposes worst plank frame instead of hiding it in the media
   assert.equal(mixed.modelDebug.worstFrameIndex, 1);
   assert.ok(mixed.modelDebug.worstFrame.metrics.bodyLineDeviation > 34);
   assert.equal(mixed.scoringMode, 'per-frame-worst-biased');
+});
+
+test('analyzeSession caps Warrior II when skeleton shape is a different pose', () => {
+  const fakeWarriorTwoButActuallyPlank = {
+    leftShoulder: { x: 0.18, y: 0.36, score: 1 }, rightShoulder: { x: 0.22, y: 0.38, score: 1 },
+    leftElbow: { x: 0.18, y: 0.52, score: 1 }, rightElbow: { x: 0.22, y: 0.54, score: 1 },
+    leftWrist: { x: 0.18, y: 0.68, score: 1 }, rightWrist: { x: 0.22, y: 0.70, score: 1 },
+    leftHip: { x: 0.50, y: 0.44, score: 1 }, rightHip: { x: 0.54, y: 0.46, score: 1 },
+    leftKnee: { x: 0.72, y: 0.50, score: 1 }, rightKnee: { x: 0.76, y: 0.52, score: 1 },
+    leftAnkle: { x: 0.92, y: 0.56, score: 1 }, rightAnkle: { x: 0.96, y: 0.58, score: 1 },
+  };
+  const result = analyzeSession({ pose: 'warrior2', userLandmarkFrames: [fakeWarriorTwoButActuallyPlank, fakeWarriorTwoButActuallyPlank] });
+  assert.ok(result.score <= 50, `score ${result.score}`);
+  assert.ok(result.feedback.some((item) => item.id === 'pose-template-mismatch'));
+  assert.ok(result.modelDebug.templateDistanceSummary.max > 0.48);
 });

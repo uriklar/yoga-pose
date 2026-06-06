@@ -8,7 +8,7 @@ const REQUIRED_BY_POSE = {
   tree: ['leftShoulder','rightShoulder','leftHip','rightHip','leftKnee','rightKnee','leftAnkle','rightAnkle'],
 };
 
-export function createModelDebug({ pose, frames = [], frameResults = [] }) {
+export function createModelDebug({ pose, frames = [], frameResults = [], templateMatches = [] }) {
   const required = REQUIRED_BY_POSE[pose] ?? REQUIRED_BY_POSE.plank;
   const frameDiagnostics = frames.map((frame, index) => {
     const gate = validateLandmarks(frame, required);
@@ -17,7 +17,8 @@ export function createModelDebug({ pose, frames = [], frameResults = [] }) {
       confidence: round(gate.confidence),
       missing: gate.missing,
       score: frameResults[index]?.score,
-      metrics: metricsForPose(pose, frame),
+      metrics: { ...metricsForPose(pose, frame), templateDistance: templateMatches[index]?.distance },
+      templateMatch: templateMatches[index],
       visibleLandmarks: Object.entries(frame).filter(([, p]) => p && Number.isFinite(p.x) && Number.isFinite(p.y) && (p.score ?? 1) >= 0.35).map(([name]) => name),
     };
   });
@@ -37,7 +38,8 @@ export function createModelDebug({ pose, frames = [], frameResults = [] }) {
     worstFrameIndex: worst?.index ?? null,
     worstFrame: worst,
     frameDiagnostics,
-    note: 'Scores are based on pose landmarks, not raw video pixels. If landmarks are missing or jumpy, the score can be misleading.',
+    templateDistanceSummary: summarizeTemplateDistances(templateMatches),
+    note: 'Scores are based on pose landmarks, not raw video pixels. If landmarks are missing, jumpy, or far from the selected pose template, the score can be misleading.',
   };
 }
 
@@ -66,4 +68,18 @@ export function plankMetrics(lm) {
 
 function round(value) {
   return Number.isFinite(value) ? Math.round(value * 10) / 10 : undefined;
+}
+
+
+function summarizeTemplateDistances(matches = []) {
+  const values = matches.map((match) => match?.distance).filter(Number.isFinite);
+  if (!values.length) return null;
+  return { min: round(Math.min(...values)), median: round(median(values)), max: round(Math.max(...values)) };
+}
+
+function median(values) {
+  const sorted = values.filter(Number.isFinite).sort((a, b) => a - b);
+  if (!sorted.length) return NaN;
+  const mid = Math.floor(sorted.length / 2);
+  return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
 }
