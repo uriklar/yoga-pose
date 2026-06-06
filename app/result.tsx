@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { loadLastResult } from '../src/mobile/sessionStore';
+import { PoseOverlay } from '../src/mobile/PoseOverlay';
 
 type Feedback = { id: string; severity: string; message: string; metric?: string; value?: number; target?: string };
 type Result = {
@@ -13,6 +14,7 @@ type Result = {
   feedback?: Feedback[];
   bodyAreaScores?: { area: string; distance: number; severity: string }[];
   referenceRecord?: { id?: string; sourceKind?: string; metadata?: { frameCount?: number } };
+  visualComparison?: any;
 };
 
 export default function ResultScreen() {
@@ -34,6 +36,8 @@ export default function ResultScreen() {
           {typeof result?.averageDistance === 'number' && <Text style={styles.metaText}>Average skeleton distance: {result.averageDistance}</Text>}
           {result?.referenceRecord?.id && <Text style={styles.metaText}>Reference cache id: {result.referenceRecord.id}</Text>}
         </View>
+
+        <PoseOverlay visual={result?.visualComparison} />
 
         <Text style={styles.section}>Top tips</Text>
         {feedback.map((item) => (

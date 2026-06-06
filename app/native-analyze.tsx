@@ -3,7 +3,6 @@ import { useRef, useState } from 'react';
 import { SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
 import { fromMediaPipeLandmarks } from '../src/core/landmarkAdapters.mjs';
-import { compareToReference } from '../src/core/referenceComparison.mjs';
 import { analyzeSession } from '../src/pipeline/sessionAnalyzer.mjs';
 import { sampleVideoFramesNative } from '../src/pipeline/frameSampler.native';
 import { buildNativeLandmarkWorkerHtml } from '../src/mobile/nativeLandmarkWorkerHtml';
@@ -101,7 +100,7 @@ export default function NativeAnalyzeScreen() {
     setStatus('Running coaching engine…');
     const result = referenceLandmarkFrames?.length
       ? {
-          ...compareToReference({ pose, userFrames: userLandmarkFrames as any, referenceFrames: referenceLandmarkFrames as any }),
+          ...analyzeSession({ pose, userLandmarkFrames: userLandmarkFrames as any, referenceLandmarkFrames: referenceLandmarkFrames as any }),
           analysisMode: 'native-webview-reference-mediapipe',
           sampledFrames: { user: userLandmarkFrames.length, reference: referenceLandmarkFrames.length },
         }

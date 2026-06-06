@@ -73,3 +73,9 @@ This project is intentionally pinned to Expo SDK 54 because Uri’s installed Ex
 ## pnpm users
 
 `expo-router` needs `@expo/metro-runtime` available as a direct dependency under pnpm’s strict resolver. This repo includes it explicitly and includes `pnpm-lock.yaml`. Verified with a clean pnpm install and `pnpm exec expo export --platform ios`.
+
+## Visual pose feedback
+
+Result feedback includes a stick-figure comparison overlay: target/reference skeleton in blue, user skeleton in pink, and highlighted body areas in yellow. The overlay is generated from stored representative landmarks (`visualComparison`) and supports both reference-video comparison and built-in target templates when no reference clip is provided.
+
+Verified with `npx tsc --noEmit`, `npm test`, and `pnpm exec expo export --platform ios`.
