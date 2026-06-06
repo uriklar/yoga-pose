@@ -11,6 +11,9 @@ type VisualComparison = {
 };
 
 const BONES = [
+  ['nose', 'leftEye', 'head'], ['nose', 'rightEye', 'head'],
+  ['leftEye', 'leftEar', 'head'], ['rightEye', 'rightEar', 'head'],
+  ['nose', 'leftShoulder', 'head'], ['nose', 'rightShoulder', 'head'],
   ['leftShoulder', 'rightShoulder', 'shoulders'],
   ['leftShoulder', 'leftElbow', 'arms'], ['leftElbow', 'leftWrist', 'arms'],
   ['rightShoulder', 'rightElbow', 'arms'], ['rightElbow', 'rightWrist', 'arms'],
@@ -18,14 +21,17 @@ const BONES = [
   ['leftHip', 'rightHip', 'hips'],
   ['leftHip', 'leftKnee', 'knees'], ['leftKnee', 'leftAnkle', 'feet'],
   ['rightHip', 'rightKnee', 'knees'], ['rightKnee', 'rightAnkle', 'feet'],
+  ['leftAnkle', 'leftHeel', 'feet'], ['leftAnkle', 'leftFootIndex', 'feet'],
+  ['rightAnkle', 'rightHeel', 'feet'], ['rightAnkle', 'rightFootIndex', 'feet'],
 ] as const;
 
 const AREA_JOINTS: Record<string, string[]> = {
+  head: ['nose', 'leftEye', 'rightEye', 'leftEar', 'rightEar'],
   shoulders: ['leftShoulder', 'rightShoulder'],
   arms: ['leftElbow', 'rightElbow', 'leftWrist', 'rightWrist'],
   hips: ['leftHip', 'rightHip'],
   knees: ['leftKnee', 'rightKnee'],
-  feet: ['leftAnkle', 'rightAnkle'],
+  feet: ['leftAnkle', 'rightAnkle', 'leftHeel', 'rightHeel', 'leftFootIndex', 'rightFootIndex'],
 };
 
 const WIDTH = 320;
@@ -48,7 +54,7 @@ export function PoseOverlay({ visual }: { visual?: VisualComparison }) {
   return (
     <View style={styles.card}>
       <Text style={styles.title}>Where your pose differs</Text>
-      <Text style={styles.subtitle}>Blue = target/reference. Pink = you. Yellow marks the body areas to fix first.</Text>
+      <Text style={styles.subtitle}>Blue = target/reference. Pink = you. Yellow marks body areas to fix first. Head and feet are drawn when landmarks are available.</Text>
       <View style={styles.canvas}>
         <SkeletonLines points={target} color="rgba(56,189,248,0.62)" width={3} highlighted={new Set()} />
         <SkeletonLines points={user} color="rgba(251,113,133,0.9)" width={4} highlighted={highlighted} />

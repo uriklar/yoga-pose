@@ -17,3 +17,12 @@ test('createVisualComparison creates template overlay when no reference frames e
   assert.ok(visual.targetPose.leftShoulder);
   assert.ok(visual.highlightedAreas.includes('hips'));
 });
+
+test('target templates include visible head and foot landmarks for richer overlays', async () => {
+  const { targetTemplateForPose } = await import('../src/core/poseTemplates.mjs');
+  const warrior = targetTemplateForPose('warrior2');
+  assert.ok(warrior.nose);
+  assert.ok(warrior.leftEye);
+  assert.ok(warrior.rightFootIndex);
+  assert.ok(Object.keys(warrior).length >= 18);
+});

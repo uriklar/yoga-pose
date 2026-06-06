@@ -91,3 +91,9 @@ Verified with `npx tsc --noEmit`, `npm test`, and `pnpm exec expo export --platf
 Rule-based scoring now compares detected landmarks against the selected pose template before allowing a high score. If the skeleton is far from the chosen pose shape (for example, a non-Warrior-II shape while Warrior II is selected), the score is capped and result feedback includes `pose-template-mismatch`. The debug panel shows selected-pose match distance with target `<0.36`.
 
 Verified with `npx tsc --noEmit`, `npm test`, and `pnpm exec expo export --platform ios`.
+
+## Fuller target skeleton overlays
+
+Built-in target templates now include head landmarks (`nose`, eyes, ears) and foot landmarks (`heel`, `footIndex`) in addition to the coaching joints. The overlay renderer draws head/neck and foot segments when landmarks exist, so template overlays look closer to MediaPipe skeletons instead of simplified torso/limb graphs.
+
+Verified with `npx tsc --noEmit`, `npm test`, and `pnpm exec expo export --platform ios`.
