@@ -28,3 +28,19 @@ test('analyzeSession uses reference comparison when reference frames exist', () 
   const result = analyzeSession({ pose: 'plank', userLandmarkFrames: [plank], referenceLandmarkFrames: [plank] });
   assert.equal(result.feedback[0].id, 'reference-good');
 });
+
+test('analyzeSession exposes worst plank frame instead of hiding it in the median skeleton', () => {
+  const good = plank;
+  const horrible = {
+    ...plank,
+    leftHip: { x: 0.55, y: 0.02, score: 0.9 },
+    rightHip: { x: 0.65, y: 0.03, score: 0.9 },
+  };
+  const goodOnly = analyzeSession({ pose: 'plank', userLandmarkFrames: [good, good, good] });
+  const mixed = analyzeSession({ pose: 'plank', userLandmarkFrames: [good, horrible, good] });
+
+  assert.ok(mixed.score < goodOnly.score, `expected mixed score ${mixed.score} to be below good score ${goodOnly.score}`);
+  assert.equal(mixed.modelDebug.worstFrameIndex, 1);
+  assert.ok(mixed.modelDebug.worstFrame.metrics.bodyLineDeviation > 34);
+  assert.equal(mixed.scoringMode, 'per-frame-worst-biased');
+});

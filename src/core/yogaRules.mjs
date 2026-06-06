@@ -69,8 +69,11 @@ export function analyzePlank(lm) {
   const shoulderWristOffset = Math.abs(shoulder.x - wrist.x);
 
   const feedback = [];
-  if (bodyLineDeviation > 14) feedback.push(item('plank-line', 'medium', 'Aim for one long line from shoulders through hips to ankles; avoid piking or sagging the hips.', 'bodyLineDeviation', bodyLineDeviation, '<14°'));
-  if (shoulderWristOffset > 0.12) feedback.push(item('plank-wrists', 'low', 'Stack shoulders closer over wrists to reduce strain.', 'shoulderWristOffset', shoulderWristOffset, '<0.12 normalized'));
+  if (bodyLineDeviation > 34) feedback.push(item('plank-line-severe', 'high', 'Your hips are far out of the plank line. First fix the big body shape: shoulders, hips, and ankles should form one long line.', 'bodyLineDeviation', bodyLineDeviation, '<14°'));
+  else if (bodyLineDeviation > 22) feedback.push(item('plank-line-major', 'medium', 'Your plank line is noticeably off. Adjust the hips until they sit between shoulders and ankles instead of piking or sagging.', 'bodyLineDeviation', bodyLineDeviation, '<14°'));
+  else if (bodyLineDeviation > 14) feedback.push(item('plank-line', 'low', 'Aim for one long line from shoulders through hips to ankles; avoid piking or sagging the hips.', 'bodyLineDeviation', bodyLineDeviation, '<14°'));
+  if (shoulderWristOffset > 0.24) feedback.push(item('plank-wrists-severe', 'medium', 'Your shoulders are far from stacked over your wrists; move your base so shoulders sit closer above hands.', 'shoulderWristOffset', shoulderWristOffset, '<0.12 normalized'));
+  else if (shoulderWristOffset > 0.12) feedback.push(item('plank-wrists', 'low', 'Stack shoulders closer over wrists to reduce strain.', 'shoulderWristOffset', shoulderWristOffset, '<0.12 normalized'));
   if (!feedback.length) feedback.push(item('plank-good', 'info', 'Strong plank line: shoulders, hips, and ankles look well aligned.'));
   return result('plank', gate.confidence, feedback);
 }

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { loadLastResult } from '../src/mobile/sessionStore';
 import { PoseOverlay } from '../src/mobile/PoseOverlay';
+import { ModelDebugPanel } from '../src/mobile/ModelDebugPanel';
 
 type Feedback = { id: string; severity: string; message: string; metric?: string; value?: number; target?: string };
 type Result = {
@@ -15,6 +16,9 @@ type Result = {
   bodyAreaScores?: { area: string; distance: number; severity: string }[];
   referenceRecord?: { id?: string; sourceKind?: string; metadata?: { frameCount?: number } };
   visualComparison?: any;
+  modelDebug?: any;
+  scoringMode?: string;
+  frameScoreSummary?: { frameCount?: number; min?: number; median?: number; max?: number };
 };
 
 export default function ResultScreen() {
@@ -38,6 +42,7 @@ export default function ResultScreen() {
         </View>
 
         <PoseOverlay visual={result?.visualComparison} />
+        <ModelDebugPanel debug={result?.modelDebug} frameSummary={result?.frameScoreSummary} scoringMode={result?.scoringMode} />
 
         <Text style={styles.section}>Top tips</Text>
         {feedback.map((item) => (

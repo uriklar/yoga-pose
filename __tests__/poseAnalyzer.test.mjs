@@ -22,7 +22,8 @@ test('plank flags bad body line', () => {
       rightWrist: { x: 0.3, y: 0.6, score: 1 },
     },
   });
-  assert.ok(result.feedback.some((f) => f.id === 'plank-line'));
+  assert.ok(result.feedback.some((f) => f.id.startsWith('plank-line')));
+  assert.ok(result.feedback.some((f) => f.metric === 'bodyLineDeviation'));
   assert.ok(summarizeAnalysis(result)[0].includes('one long line'));
 });
 
